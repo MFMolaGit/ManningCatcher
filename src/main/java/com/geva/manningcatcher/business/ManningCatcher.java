@@ -2,12 +2,15 @@ package com.geva.manningcatcher.business;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Offer;
 import com.geva.manningcatcher.dao.read.DOTDManningReader;
 import com.geva.manningcatcher.dao.read.ManningReader;
 import com.geva.manningcatcher.dao.write.ManningWriter;
 import com.geva.manningcatcher.dao.write.OfferManningWriter;
+import com.geva.manningcatcher.utils.OfferNodes;
 
 
 public class ManningCatcher {
@@ -16,11 +19,11 @@ public class ManningCatcher {
 	
 	private ManningReader<Offer> offerReader;
 	
-	private ManningWriter<Offer> writer;
+	private ManningWriter<Offer> offerWriter;
 	
 	public ManningCatcher() {
 		offerReader = new DOTDManningReader(URLMANNINGOFFERS);
-		writer = new OfferManningWriter();
+		offerWriter = new OfferManningWriter();
 	}
 	
 	public Offer catchNewOffer() {
@@ -30,7 +33,7 @@ public class ManningCatcher {
 		
 		if(newOffer.isNewOffer()) {
 //			statisticOffer(offer);
-			writer.write(offer);
+			offerWriter.write(offer);
 		}
 		
 		return offer;
@@ -41,7 +44,7 @@ public class ManningCatcher {
 	}
 
 	public Offer getOffer(String date) {
-		return offerReader.read(date);
+		return offerReader.read(OfferNodes.DATE, date);
 	}
 
 //	private void statisticOffer(Offer offer) {

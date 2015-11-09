@@ -4,35 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.bson.types.ObjectId;
 
+import com.geva.manningcatcher.business.ObjectIdAdapter;
+
+@XmlRootElement
 public class Pack {
 
 	private ObjectId id;
 	
-	private List<String> books;
+	private List<Book> books;
 	
 	private Integer times;
 
 	public Pack() {
-		books = new ArrayList<String>();
+		books = new ArrayList<Book>();
 	}
 	
 	/**
 	 * @return the books
 	 */
-	public List<String> getBooks() {
+	public List<Book> getBooks() {
 		return books;
 	}
 
 	/**
 	 * @param books the books to set
 	 */
-	@XmlElementWrapper(name = "books")
-	@XmlElement(name = "book")	
-	public void setBooks(List<String> books) {
+	@XmlElement(name = "books")	
+	public void setBooks(List<Book> books) {
 		this.books = books;
 	}
 
@@ -49,13 +52,14 @@ public class Pack {
 		return id;
 	}
 
+	@XmlJavaTypeAdapter(ObjectIdAdapter.class)
 	@XmlElement
 	public void setId(ObjectId id) {
 		this.id = id;
 	}
 
-	public void addBook(String title) {
-		books.add(title);
+	public void addBook(Book book) {
+		books.add(book);
 	}
 	
 	public void addTime() {

@@ -17,13 +17,16 @@ import java.util.regex.Pattern;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import com.geva.manningcatcher.beans.Book;
 import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Offer;
 import com.geva.manningcatcher.beans.Pack;
 import com.geva.manningcatcher.dao.ManningConverter;
 import com.geva.manningcatcher.dao.MongoManningConnector;
+import com.geva.manningcatcher.utils.BookNodes;
 import com.geva.manningcatcher.utils.Constants;
 import com.geva.manningcatcher.utils.OfferNodes;
+import com.geva.manningcatcher.utils.PackNodes;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 
@@ -37,7 +40,9 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
     private BufferedReader br;
     
     private ManningReader<Pack> packManningReader;
-	
+    
+    private ManningReader<Book> bookManningReader;
+    
     public DOTDManningReader(final String urlSource) {
 	    try {
 	        url = new URL(urlSource);
@@ -46,6 +51,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 	    }
 	    
 	    packManningReader = new PackManningReader();
+	    bookManningReader = new BookManningReader();
     }
     
     @Override
@@ -56,7 +62,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
         Date today = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);
         
-        Offer offer = read(formatter.format(today));
+        Offer offer = read(OfferNodes.DATE, formatter.format(today));
         
         if(offer == null) {
         
@@ -69,15 +75,20 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 		        while((line = br.readLine()) != null) {
 		        	Matcher mMainBookAndCode = mainBookAndCodePattern.matcher(line);
 			        	if(mMainBookAndCode.find() && !codeAdded){
-			        		newOffer.getObject().addBook(mMainBookAndCode.group(1));
+			        		
+			        		Book book1 = bookManningReader.read(BookNodes.TITLE, mMainBookAndCode.group(1));
+			        		
+			        		newOffer.getObject().addBook(book1);
 			        		newOffer.getObject().setOffercode(mMainBookAndCode.group(2));
 			        		codeAdded = true;
 			        	}
 		        	
 		        	Matcher mExtraBooks = extraBooksPattern.matcher(line);
 			        	if(mExtraBooks.find()){
-			        		newOffer.getObject().addBook(mExtraBooks.group(1));
-			        		newOffer.getObject().addBook(mExtraBooks.group(2));
+			        		Book book2 = bookManningReader.read(BookNodes.TITLE, mExtraBooks.group(1));
+			        		Book book3 = bookManningReader.read(BookNodes.TITLE, mExtraBooks.group(2));
+			        		newOffer.getObject().addBook(book2);
+			        		newOffer.getObject().addBook(book3);
 			        	}	        	
 		        }
 	        }catch (IOException ioe) {
@@ -120,7 +131,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 		    	
 		    	ObjectId packId = result.getObjectId(PACKID);
 		    	
-		    	offer.setPack(packManningReader.read(packId.toHexString()));
+		    	offer.setPack(packManningReader.read(PackNodes.PACKID, packId.toHexString()));
 		    	
 		    	offers.add(offer);
 		    }
@@ -130,8 +141,8 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 	}
 
     @Override
-	public Offer read(String date) {
-		FindIterable<Document> results = MongoManningConnector.connect(Constants.MONGO_OFFERS_COLLECTION).find(new Document(DATE, date));
+	public Offer read(String field, String value) {
+		FindIterable<Document> results = MongoManningConnector.connect(Constants.MONGO_OFFERS_COLLECTION).find(new Document(field, value));
 		final SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);		
 		Document result = results.first();
 		Offer offer = null;
@@ -148,9 +159,10 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 
 			ObjectId packId = result.getObjectId(PACKID);
 	    	
-	    	offer.setPack(packManningReader.read(packId.toHexString()));
+	    	offer.setPack(packManningReader.read(PackNodes.PACKID, packId.toHexString()));
 		}
 		
 		return offer;
 	}
+
 }

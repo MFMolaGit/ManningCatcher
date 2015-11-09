@@ -41,11 +41,11 @@ public class Offer {
 		this.readDate = readDate;
 	}
 	
-	public void addBook(String title) {
-		pack.addBook(title);
+	public void addBook(Book book) {
+		pack.addBook(book);
 	}
 	
-	public List<String> getBooks() {
+	public List<Book> getBooks() {
 		return pack.getBooks();
 	}
 	
@@ -69,9 +69,9 @@ public class Offer {
 			.append('\n')
 			.append("LIBROS:");
 			
-		for(String book:pack.getBooks()) {
+		for(Book book:pack.getBooks()) {
 			results.append('\t')
-					.append(book)
+					.append(book.getTitle())
 					.append('\n');
 		}
 		

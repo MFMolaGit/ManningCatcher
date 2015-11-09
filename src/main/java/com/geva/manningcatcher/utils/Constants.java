@@ -17,9 +17,9 @@ public class Constants {
 	/** COLLECTIONS PROPERTY NAMES **/
 	public static final String MONGO_OFFERS_COLLECTION = "MONGO_OFFERS_COLLECTION";
 	public static final String MONGO_PACKS_COLLECTION = "MONGO_PACKS_COLLECTION";
+	public static final String MONGO_BOOKS_COLLECTION = "MONGO_BOOKS_COLLECTION";
 	
 	/** FORMATS **/
 	public static final String DATEFORMAT = "dd-MM-yyyy";
-	
-	
+
 }

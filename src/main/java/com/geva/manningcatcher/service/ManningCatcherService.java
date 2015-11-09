@@ -20,21 +20,21 @@ public class ManningCatcherService {
 	}
 	
 	@GET
-	@Produces("application/xml")
+	@Produces("application/json")
 	@Path(value = "/catchOffer")
 	public Offer getOffer() {
 		return catcher.catchNewOffer();
 	}
 	
 	@GET
-	@Produces("application/xml")
+	@Produces("application/json")
 	@Path(value = "/offer/{date}")
 	public Offer getOffer(@PathParam(value = "date") String date) {
 		return catcher.getOffer(date);
 	}
 	
 	@GET
-	@Produces("application/xml")
+	@Produces("application/json")
 	@Path(value = "/list")
 	public List<Offer> getAllOffers() {
 		return catcher.listOffers();

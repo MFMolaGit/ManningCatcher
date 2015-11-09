@@ -6,9 +6,11 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import com.geva.manningcatcher.beans.Book;
 import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Pack;
 import com.geva.manningcatcher.dao.MongoManningConnector;
+import com.geva.manningcatcher.utils.BookNodes;
 import com.geva.manningcatcher.utils.Constants;
 import com.geva.manningcatcher.utils.PackNodes;
 import com.mongodb.Block;
@@ -17,9 +19,12 @@ import com.mongodb.client.MongoCollection;
 
 public class PackManningReader implements ManningReader<Pack>, PackNodes {
 
+	private BookManningReader bookManningReader;
+	
 	private MongoCollection<Document> collection;
 	
 	public PackManningReader() {
+		bookManningReader = new BookManningReader();
 		collection = MongoManningConnector.connect(Constants.MONGO_PACKS_COLLECTION);
 	}
 	
@@ -30,15 +35,23 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 	}
 
 	@Override
-	public Pack read(String id) {
-		ObjectId packId = new ObjectId(id);
-		List<Document> packsFound = collection.find(new Document(PACKID, packId)).into(new ArrayList<Document>());
+	public Pack read(String field, String value) {
+		ObjectId packId = new ObjectId(value);
+		List<Document> packsFound = collection.find(new Document(field, packId)).into(new ArrayList<Document>());
 		Pack pack = new Pack();
 		
 		if(!packsFound.isEmpty()) {
 			Document dPack = packsFound.get(0); 
 			pack.setId(dPack.getObjectId(PACKID));
-			pack.setBooks((List<String>) dPack.get(BOOKS));
+			
+			List<ObjectId> bookIds = (List<ObjectId>) dPack.get(BOOKS);
+			List<Book> books = new ArrayList<Book>();
+			
+				for(ObjectId bookId:bookIds) {
+					books.add(bookManningReader.read(BookNodes.BOOKID, bookId.toHexString()));
+				}
+			
+			pack.setBooks(books);
 			pack.setTimes(dPack.getInteger(TIMES));
 		}
 			
@@ -57,10 +70,15 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 		    	
 		    	pack.setId(result.getObjectId(PACKID));
 		    	
-		    	List<String> books = (List<String>) result.get(BOOKS);
+				List<String> bookIds = (List<String>) result.get(BOOKS);
+				List<Book> books = new ArrayList<Book>();
+				
+					for(String bookId:bookIds) {
+						books.add(bookManningReader.read(BookNodes.BOOKID, bookId));
+					}
 		    	
+				pack.setBooks(books);
 		    	pack.setTimes(result.getInteger(TIMES));
-		    	
 		    	packs.add(pack);
 		    }
 		});

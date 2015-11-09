@@ -8,7 +8,7 @@ public interface ManningReader<T> {
 	
 	New<T> read();
 	
-	T read(String field);
+	T read(String field, String value);
 	
 	List<T> readAll();
 
