@@ -1,4 +1,4 @@
-package com.geva.manningcatcher.business;
+package com.geva.manningcatcher.business.adapters;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

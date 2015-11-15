@@ -1,0 +1,52 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+ 	<!-- <context:annotation-config/> -->
+ 	<!-- <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/> -->
+
+	<context:component-scan base-package="com.geva.manningcatcher" />
+
+	<bean id="offerConnector" class="com.geva.manningcatcher.dao.MongoManningConnector">
+		<constructor-arg index="0" value="#{T(com.geva.manningcatcher.utils.Constants).MONGO_OFFERS_COLLECTION}"/>
+	</bean>
+	
+	<bean id="offersCollection" factory-bean="offerConnector" factory-method="connect"/>
+	
+	<bean id="packConnector" class="com.geva.manningcatcher.dao.MongoManningConnector">
+		<constructor-arg index="0" value="#{T(com.geva.manningcatcher.utils.Constants).MONGO_PACKS_COLLECTION}"/>
+	</bean>
+	
+	<bean id="packsCollection" factory-bean="packConnector" factory-method="connect"/>
+	
+	<bean id="bookConnector" class="com.geva.manningcatcher.dao.MongoManningConnector">
+		<constructor-arg index="0" value="#{T(com.geva.manningcatcher.utils.Constants).MONGO_BOOKS_COLLECTION}"/>
+	</bean>
+	
+	<bean id="booksCollection" factory-bean="bookConnector" factory-method="connect"/>
+	
+	<!-- <bean id="offerWriter" class="com.geva.manningcatcher.dao.write.OfferManningWriter">
+		<constructor-arg name="collection" ref="offersCollection"/>
+	</bean>
+	<bean id="packWriter" class="com.geva.manningcatcher.dao.write.PackManningWriter">
+		<constructor-arg name="collection" ref="packsCollection"/>
+	</bean>
+	<bean id="bookWriter" class="com.geva.manningcatcher.dao.write.BookManningWriter">
+		<constructor-arg name="collection" ref="booksCollection"/>
+	</bean>
+
+	<bean id="offerReader" class="com.geva.manningcatcher.dao.read.DOTDManningReader">
+		<constructor-arg name="urlSource" value="https://manning.com/dotd"/>
+		<constructor-arg name="collection" ref="offersCollection"/>
+	</bean>
+	<bean id="packReader" class="com.geva.manningcatcher.dao.read.PackManningReader">
+		<constructor-arg name="collection" ref="packsCollection"/>
+	</bean>
+	<bean id="bookReader" class="com.geva.manningcatcher.dao.read.BookManningReader">
+		<constructor-arg name="collection" ref="booksCollection"/>
+	</bean> -->
+	
+	<!-- <bean id="catcher" class="com.geva.manningcatcher.business.ManningCatcher"/> -->
+	
+</beans>

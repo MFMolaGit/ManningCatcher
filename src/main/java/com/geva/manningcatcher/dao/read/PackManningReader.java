@@ -5,28 +5,33 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.Book;
 import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Pack;
-import com.geva.manningcatcher.dao.MongoManningConnector;
 import com.geva.manningcatcher.utils.BookNodes;
-import com.geva.manningcatcher.utils.Constants;
 import com.geva.manningcatcher.utils.PackNodes;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
+@Component(value="packReader")
 public class PackManningReader implements ManningReader<Pack>, PackNodes {
 
-	private BookManningReader bookManningReader;
+	@Autowired
+	@Qualifier(value="bookReader")
+	private BookManningReader bookReader;
 	
-	private MongoCollection<Document> collection;
+	@Autowired
+	@Qualifier(value="packsCollection")
+	private MongoCollection<Document> packsCollection;
 	
-	public PackManningReader() {
-		bookManningReader = new BookManningReader();
-		collection = MongoManningConnector.connect(Constants.MONGO_PACKS_COLLECTION);
-	}
+//	public PackManningReader(MongoCollection<Document> collection) {
+//		this.packsCollection = collection;
+//	}
 	
 	@Override
 	public New<Pack> read() {
@@ -37,7 +42,7 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 	@Override
 	public Pack read(String field, String value) {
 		ObjectId packId = new ObjectId(value);
-		List<Document> packsFound = collection.find(new Document(field, packId)).into(new ArrayList<Document>());
+		List<Document> packsFound = packsCollection.find(new Document(field, packId)).into(new ArrayList<Document>());
 		Pack pack = new Pack();
 		
 		if(!packsFound.isEmpty()) {
@@ -48,7 +53,7 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 			List<Book> books = new ArrayList<Book>();
 			
 				for(ObjectId bookId:bookIds) {
-					books.add(bookManningReader.read(BookNodes.BOOKID, bookId.toHexString()));
+					books.add(bookReader.read(BookNodes.BOOKID, bookId.toHexString()));
 				}
 			
 			pack.setBooks(books);
@@ -60,7 +65,7 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 
 	@Override
 	public List<Pack> readAll() {
-		FindIterable<Document> packsFound = collection.find();
+		FindIterable<Document> packsFound = packsCollection.find();
 		final List<Pack> packs = new ArrayList<Pack>();
 		
 		packsFound.forEach(new Block<Document>() {
@@ -74,7 +79,7 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 				List<Book> books = new ArrayList<Book>();
 				
 					for(String bookId:bookIds) {
-						books.add(bookManningReader.read(BookNodes.BOOKID, bookId));
+						books.add(bookReader.read(BookNodes.BOOKID, bookId));
 					}
 		    	
 				pack.setBooks(books);

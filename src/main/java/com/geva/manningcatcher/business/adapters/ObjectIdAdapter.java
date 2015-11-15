@@ -1,4 +1,4 @@
-package com.geva.manningcatcher.business;
+package com.geva.manningcatcher.business.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

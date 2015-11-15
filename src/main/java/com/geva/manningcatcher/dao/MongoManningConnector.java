@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.geva.manningcatcher.service.ManningCatcherService;
 import com.geva.manningcatcher.utils.Constants;
@@ -18,8 +19,14 @@ public class MongoManningConnector {
 
 	private static MongoDatabase mongoDB;
 	private static MongoClient mongoClient;
+	private String collectionParam;
 	
-	public static MongoCollection<Document> connect(final String collectionParam) {
+	@Autowired
+	public MongoManningConnector(final String collectionParam) {
+		this.collectionParam = collectionParam;
+	}
+	
+	public MongoCollection<Document> connect() {
 		
 		MongoCollection<Document> mongoCollection = null;
 		String uriMongo, dbMongo, collection;

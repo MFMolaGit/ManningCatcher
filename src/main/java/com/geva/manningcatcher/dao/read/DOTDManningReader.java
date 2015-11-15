@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,21 +15,24 @@ import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.Book;
 import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Offer;
 import com.geva.manningcatcher.beans.Pack;
-import com.geva.manningcatcher.dao.ManningConverter;
-import com.geva.manningcatcher.dao.MongoManningConnector;
 import com.geva.manningcatcher.utils.BookNodes;
 import com.geva.manningcatcher.utils.Constants;
 import com.geva.manningcatcher.utils.OfferNodes;
 import com.geva.manningcatcher.utils.PackNodes;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 
-public class DOTDManningReader extends ManningConverter implements ManningReader<Offer>, OfferNodes {
+@Component(value="offerReader")
+public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 
 	private static Pattern mainBookAndCodePattern = Pattern.compile(">Get half off (.*?) - use code (dotd\\d+)<");
 	private static Pattern extraBooksPattern = Pattern.compile("Use this same code to save 50% on.*?<i>(.*?)<\\/i>.*?<i>(.*?)<\\/i>");
@@ -39,20 +41,29 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
     private InputStream is = null;
     private BufferedReader br;
     
-    private ManningReader<Pack> packManningReader;
+    @Autowired
+    @Qualifier(value="offersCollection")
+	private MongoCollection<Document> offersCollection;
     
-    private ManningReader<Book> bookManningReader;
+    @Autowired
+    @Qualifier(value="packReader")
+    private ManningReader<Pack> packReader;
     
-    public DOTDManningReader(final String urlSource) {
-	    try {
-	        url = new URL(urlSource);
-	    } catch (MalformedURLException mue) {
-	         mue.printStackTrace();
-	    }
-	    
-	    packManningReader = new PackManningReader();
-	    bookManningReader = new BookManningReader();
-    }
+    @Autowired
+    @Qualifier(value="bookReader")
+    private ManningReader<Book> bookReader;
+    
+    private String urlSource = "https://manning.com/dotd";
+    
+//    @Autowired
+//    public DOTDManningReader(final String urlSource, MongoCollection<Document> collection) {
+//	    try {
+//	    	offersCollection = collection;
+//	        url = new URL(urlSource);
+//	    } catch (MalformedURLException mue) {
+//	         mue.printStackTrace();
+//	    }
+//    }
     
     @Override
 	public New<Offer> read() {
@@ -76,7 +87,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 		        	Matcher mMainBookAndCode = mainBookAndCodePattern.matcher(line);
 			        	if(mMainBookAndCode.find() && !codeAdded){
 			        		
-			        		Book book1 = bookManningReader.read(BookNodes.TITLE, mMainBookAndCode.group(1));
+			        		Book book1 = bookReader.read(BookNodes.TITLE, mMainBookAndCode.group(1));
 			        		
 			        		newOffer.getObject().addBook(book1);
 			        		newOffer.getObject().setOffercode(mMainBookAndCode.group(2));
@@ -85,8 +96,8 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 		        	
 		        	Matcher mExtraBooks = extraBooksPattern.matcher(line);
 			        	if(mExtraBooks.find()){
-			        		Book book2 = bookManningReader.read(BookNodes.TITLE, mExtraBooks.group(1));
-			        		Book book3 = bookManningReader.read(BookNodes.TITLE, mExtraBooks.group(2));
+			        		Book book2 = bookReader.read(BookNodes.TITLE, mExtraBooks.group(1));
+			        		Book book3 = bookReader.read(BookNodes.TITLE, mExtraBooks.group(2));
 			        		newOffer.getObject().addBook(book2);
 			        		newOffer.getObject().addBook(book3);
 			        	}	        	
@@ -114,7 +125,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 	public List<Offer> readAll() {
 		final List<Offer> offers = new ArrayList<Offer>();
 		final SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);
-		FindIterable<Document> results = MongoManningConnector.connect(Constants.MONGO_OFFERS_COLLECTION).find();
+		FindIterable<Document> results = offersCollection.find();
 		
 		results.forEach(new Block<Document>() {
 		    @Override
@@ -131,7 +142,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 		    	
 		    	ObjectId packId = result.getObjectId(PACKID);
 		    	
-		    	offer.setPack(packManningReader.read(PackNodes.PACKID, packId.toHexString()));
+		    	offer.setPack(packReader.read(PackNodes.PACKID, packId.toHexString()));
 		    	
 		    	offers.add(offer);
 		    }
@@ -142,7 +153,7 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 
     @Override
 	public Offer read(String field, String value) {
-		FindIterable<Document> results = MongoManningConnector.connect(Constants.MONGO_OFFERS_COLLECTION).find(new Document(field, value));
+		FindIterable<Document> results = offersCollection.find(new Document(field, value));
 		final SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);		
 		Document result = results.first();
 		Offer offer = null;
@@ -159,10 +170,24 @@ public class DOTDManningReader extends ManningConverter implements ManningReader
 
 			ObjectId packId = result.getObjectId(PACKID);
 	    	
-	    	offer.setPack(packManningReader.read(PackNodes.PACKID, packId.toHexString()));
+	    	offer.setPack(packReader.read(PackNodes.PACKID, packId.toHexString()));
 		}
 		
 		return offer;
+	}
+
+	/**
+	 * @return the urlSource
+	 */
+	public String getUrlSource() {
+		return urlSource;
+	}
+
+	/**
+	 * @param urlSource the urlSource to set
+	 */
+	public void setUrlSource(String urlSource) {
+		this.urlSource = urlSource;
 	}
 
 }

@@ -7,17 +7,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import com.geva.manningcatcher.beans.Offer;
 import com.geva.manningcatcher.business.ManningCatcher;
 
+@Component
 @Path("/manningCatcher")
 public class ManningCatcherService {
 	
+	@Autowired
+	@Qualifier(value="catcher")
 	private ManningCatcher catcher;
-	
-	public ManningCatcherService() {
-		catcher = new ManningCatcher();
-	}
 	
 	@GET
 	@Produces("application/json")
@@ -38,5 +41,6 @@ public class ManningCatcherService {
 	@Path(value = "/list")
 	public List<Offer> getAllOffers() {
 		return catcher.listOffers();
-	} 
+	}
+	
 }

@@ -2,29 +2,28 @@ package com.geva.manningcatcher.business;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Offer;
-import com.geva.manningcatcher.dao.read.DOTDManningReader;
 import com.geva.manningcatcher.dao.read.ManningReader;
 import com.geva.manningcatcher.dao.write.ManningWriter;
-import com.geva.manningcatcher.dao.write.OfferManningWriter;
 import com.geva.manningcatcher.utils.OfferNodes;
 
-
+@Component(value="catcher")
 public class ManningCatcher {
 
-	private static final String URLMANNINGOFFERS = "https://manning.com/dotd";
-	
+	@Autowired
+	@Qualifier(value="offerReader")
+//	@InjectParam(value="offerReader")
 	private ManningReader<Offer> offerReader;
 	
+	@Autowired
+	@Qualifier(value="offerWriter")
+//	@InjectParam(value="offerWriter")
 	private ManningWriter<Offer> offerWriter;
-	
-	public ManningCatcher() {
-		offerReader = new DOTDManningReader(URLMANNINGOFFERS);
-		offerWriter = new OfferManningWriter();
-	}
 	
 	public Offer catchNewOffer() {
 		

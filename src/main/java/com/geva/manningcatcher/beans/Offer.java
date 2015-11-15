@@ -1,13 +1,12 @@
 package com.geva.manningcatcher.beans;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.geva.manningcatcher.business.DateAdapter;
+import com.geva.manningcatcher.business.adapters.DateAdapter;
 
 @XmlRootElement
 public class Offer {
@@ -45,9 +44,9 @@ public class Offer {
 		pack.addBook(book);
 	}
 	
-	public List<Book> getBooks() {
-		return pack.getBooks();
-	}
+//	public List<Book> getBooks() {
+//		return pack.getBooks();
+//	}
 	
 	public Pack getPack() {
 		return pack;

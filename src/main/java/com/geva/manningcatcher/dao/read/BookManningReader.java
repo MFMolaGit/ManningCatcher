@@ -5,23 +5,27 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.Book;
 import com.geva.manningcatcher.beans.New;
-import com.geva.manningcatcher.dao.MongoManningConnector;
 import com.geva.manningcatcher.utils.BookNodes;
-import com.geva.manningcatcher.utils.Constants;
 import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
+@Component(value="bookReader")
 public class BookManningReader implements ManningReader<Book>, BookNodes {
 
-	private MongoCollection<Document> collection;
+	@Autowired
+	@Qualifier(value="booksCollection")
+	private MongoCollection<Document> booksCollection;
 	
-	public BookManningReader() {
-		collection = MongoManningConnector.connect(Constants.MONGO_BOOKS_COLLECTION);
-	}
+//	public BookManningReader(MongoCollection<Document> collection) {
+//		this.booksCollection = collection;
+//	}
 	
 	@Override
 	public New<Book> read() {
@@ -40,7 +44,7 @@ public class BookManningReader implements ManningReader<Book>, BookNodes {
 			oId = new ObjectId(value);
 		}
 		
-		List<Document> booksFound = collection.find(new Document(field, isIdField?oId:value)).into(new ArrayList<Document>());
+		List<Document> booksFound = booksCollection.find(new Document(field, isIdField?oId:value)).into(new ArrayList<Document>());
 		Book book = new Book();
 		
 		if(!booksFound.isEmpty()) {
@@ -62,7 +66,7 @@ public class BookManningReader implements ManningReader<Book>, BookNodes {
 	
 	@Override
 	public List<Book> readAll() {
-		FindIterable<Document> packsFound = collection.find();
+		FindIterable<Document> packsFound = booksCollection.find();
 		final List<Book> books = new ArrayList<Book>();
 		
 		packsFound.forEach(new Block<Document>() {

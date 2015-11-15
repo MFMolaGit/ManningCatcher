@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.bson.types.ObjectId;
 
-import com.geva.manningcatcher.business.ObjectIdAdapter;
+import com.geva.manningcatcher.business.adapters.ObjectIdAdapter;
 
 @XmlRootElement
 public class Pack {
