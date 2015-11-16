@@ -25,11 +25,6 @@ public class OfferManningWriter implements ManningWriter<Offer>, OfferNodes {
 	@Qualifier(value="offersCollection")
 	private MongoCollection<Document> offersCollection;
 
-//	@Autowired
-//	public OfferManningWriter(MongoCollection<Document> collection) {
-//		this.offersCollection = collection;
-//	}
-	
 	@Override
 	public String write(Offer offer) {
 		SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);

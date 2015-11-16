@@ -23,10 +23,6 @@ public class BookManningReader implements ManningReader<Book>, BookNodes {
 	@Qualifier(value="booksCollection")
 	private MongoCollection<Document> booksCollection;
 	
-//	public BookManningReader(MongoCollection<Document> collection) {
-//		this.booksCollection = collection;
-//	}
-	
 	@Override
 	public New<Book> read() {
 		// TODO Auto-generated method stub

@@ -17,10 +17,6 @@ public class BookManningWriter implements ManningWriter<Book>, BookNodes {
 	@Qualifier(value="booksCollection")
 	private MongoCollection<Document> booksCollection;
 	
-//	public BookManningWriter(MongoCollection<Document> collection) {
-//		this.booksCollection = collection;
-//	}
-	
 	@Override
 	public String write(Book book) {
 		Document titleDoc = new Document(TITLE, book.getTitle());

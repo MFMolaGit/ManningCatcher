@@ -29,10 +29,6 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 	@Qualifier(value="packsCollection")
 	private MongoCollection<Document> packsCollection;
 	
-//	public PackManningReader(MongoCollection<Document> collection) {
-//		this.packsCollection = collection;
-//	}
-	
 	@Override
 	public New<Pack> read() {
 		// TODO Auto-generated method stub

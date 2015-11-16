@@ -25,11 +25,6 @@ public class PackManningWriter implements ManningWriter<Pack>, PackNodes {
 	@Qualifier(value="packsCollection")
 	private MongoCollection<Document> packsCollection;
 	
-//	@Autowired
-//	public PackManningWriter(MongoCollection<Document> collection) {
-//		this.packsCollection = collection;
-//	}
-	
 	@Override
 	public String write(Pack pack) {
 		List<ObjectId> bookIds = new ArrayList<ObjectId>();

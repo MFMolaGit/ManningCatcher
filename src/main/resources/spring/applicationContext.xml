@@ -3,25 +3,34 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
- 	<!-- <context:annotation-config/> -->
- 	<!-- <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/> -->
-
 	<context:component-scan base-package="com.geva.manningcatcher" />
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:config/context.properties</value>
+		</property>
+	</bean>
 
 	<bean id="offerConnector" class="com.geva.manningcatcher.dao.MongoManningConnector">
-		<constructor-arg index="0" value="#{T(com.geva.manningcatcher.utils.Constants).MONGO_OFFERS_COLLECTION}"/>
+		<constructor-arg index="0" value="${MONGO_OFFERS_COLLECTION}"/>
+		<constructor-arg index="1" value="${MONGOLAB_URI}"/>
+		<constructor-arg index="2" value="${MONGO_DB}"/>
 	</bean>
 	
 	<bean id="offersCollection" factory-bean="offerConnector" factory-method="connect"/>
 	
 	<bean id="packConnector" class="com.geva.manningcatcher.dao.MongoManningConnector">
-		<constructor-arg index="0" value="#{T(com.geva.manningcatcher.utils.Constants).MONGO_PACKS_COLLECTION}"/>
+		<constructor-arg index="0" value="${MONGO_PACKS_COLLECTION}"/>
+		<constructor-arg index="1" value="${MONGOLAB_URI}"/>
+		<constructor-arg index="2" value="${MONGO_DB}"/>		
 	</bean>
 	
 	<bean id="packsCollection" factory-bean="packConnector" factory-method="connect"/>
 	
 	<bean id="bookConnector" class="com.geva.manningcatcher.dao.MongoManningConnector">
-		<constructor-arg index="0" value="#{T(com.geva.manningcatcher.utils.Constants).MONGO_BOOKS_COLLECTION}"/>
+		<constructor-arg index="0" value="${MONGO_BOOKS_COLLECTION}"/>
+		<constructor-arg index="1" value="${MONGOLAB_URI}"/>
+		<constructor-arg index="2" value="${MONGO_DB}"/>		
 	</bean>
 	
 	<bean id="booksCollection" factory-bean="bookConnector" factory-method="connect"/>

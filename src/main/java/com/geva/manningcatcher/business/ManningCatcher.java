@@ -17,12 +17,10 @@ public class ManningCatcher {
 
 	@Autowired
 	@Qualifier(value="offerReader")
-//	@InjectParam(value="offerReader")
 	private ManningReader<Offer> offerReader;
 	
 	@Autowired
 	@Qualifier(value="offerWriter")
-//	@InjectParam(value="offerWriter")
 	private ManningWriter<Offer> offerWriter;
 	
 	public Offer catchNewOffer() {

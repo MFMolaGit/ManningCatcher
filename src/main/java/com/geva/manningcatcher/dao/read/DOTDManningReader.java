@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,6 +18,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.Book;
@@ -53,17 +55,12 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
     @Qualifier(value="bookReader")
     private ManningReader<Book> bookReader;
     
-    private String urlSource = "https://manning.com/dotd";
+    private String urlSource;
     
-//    @Autowired
-//    public DOTDManningReader(final String urlSource, MongoCollection<Document> collection) {
-//	    try {
-//	    	offersCollection = collection;
-//	        url = new URL(urlSource);
-//	    } catch (MalformedURLException mue) {
-//	         mue.printStackTrace();
-//	    }
-//    }
+    @Autowired
+    public DOTDManningReader(@Value(value="${URLMANNINGOFFERS}") final String urlSource) {
+    	this.urlSource = urlSource;
+    }    
     
     @Override
 	public New<Offer> read() {
@@ -78,6 +75,7 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
         if(offer == null) {
         
 	        try {
+		        url = new URL(urlSource);      	
 		        is = url.openStream();
 		        br = new BufferedReader(new InputStreamReader(is));
 		        newOffer = new New<Offer>(Offer.class);
@@ -102,12 +100,17 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 			        		newOffer.getObject().addBook(book3);
 			        	}	        	
 		        }
-	        }catch (IOException ioe) {
+	        } catch (MalformedURLException mue) {
+		         mue.printStackTrace();
+		    } catch (IOException ioe) {
 		         ioe.printStackTrace();
 		    } finally {
 		        try {
-		            if (is != null) is.close();
+		            if (is != null) { 
+		            	is.close();
+		            }	
 		        } catch (IOException ioe) {
+		        	ioe.printStackTrace();
 		        }
 		    }
 	        
@@ -174,20 +177,6 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 		}
 		
 		return offer;
-	}
-
-	/**
-	 * @return the urlSource
-	 */
-	public String getUrlSource() {
-		return urlSource;
-	}
-
-	/**
-	 * @param urlSource the urlSource to set
-	 */
-	public void setUrlSource(String urlSource) {
-		this.urlSource = urlSource;
 	}
 
 }
