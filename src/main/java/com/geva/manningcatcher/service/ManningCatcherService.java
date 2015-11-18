@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.Offer;
@@ -16,6 +17,7 @@ import com.geva.manningcatcher.business.ManningCatcher;
 
 @Component
 @Path("/manningCatcher")
+@EnableScheduling
 public class ManningCatcherService {
 	
 	@Autowired
@@ -26,7 +28,7 @@ public class ManningCatcherService {
 	@Produces("application/json")
 	@Path(value = "/catchOffer")
 	public Offer getOffer() {
-		return catcher.catchNewOffer();
+		return catcher.catchLastOffer();
 	}
 	
 	@GET
