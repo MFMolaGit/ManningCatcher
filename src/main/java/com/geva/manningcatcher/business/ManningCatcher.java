@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.geva.manningcatcher.beans.New;
@@ -23,17 +24,10 @@ public class ManningCatcher {
 	@Qualifier(value="offerWriter")
 	private ManningWriter<Offer> offerWriter;
 	
-	public Offer catchNewOffer() {
-		
-		New<Offer> newOffer = offerReader.read();
-		Offer offer = newOffer.getObject();
-		
-		if(newOffer.isNewOffer()) {
-//			statisticOffer(offer);
-			offerWriter.write(offer);
-		}
-		
-		return offer;
+	private Offer lastOffer;
+	
+	public Offer catchLastOffer() {
+		return lastOffer;
 	}
 	
 	public List<Offer> listOffers() {
@@ -44,6 +38,17 @@ public class ManningCatcher {
 		return offerReader.read(OfferNodes.DATE, date);
 	}
 
+	@Scheduled(cron = "${TIMETOCATCH}")
+	public void catchNewOffer() {
+		New<Offer> newOffer = offerReader.read();
+	    lastOffer = newOffer.getObject();
+		
+		if(newOffer.isNewOffer()) {
+//			statisticOffer(offer);
+			offerWriter.write(lastOffer);
+		}
+	}
+	
 //	private void statisticOffer(Offer offer) {
 //		List<Offer> oldOffers = listOffers();
 //		boolean isNewPack = true;
