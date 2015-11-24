@@ -10,6 +10,8 @@ public interface ManningReader<T> {
 	
 	T read(String field, String value);
 	
+	List<T> readSome(String field, String value);
+	
 	List<T> readAll();
-
+	
 }

@@ -155,6 +155,39 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 	}
 
     @Override
+	public List<Offer> readSome(final String field, final String value) {
+		final List<Offer> offers = new ArrayList<Offer>();
+		final SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);
+		List<Pack> packs = packReader.readSome(field, value);
+		
+		for(Pack pack:packs) {
+			FindIterable<Document> results = offersCollection.find(new Document(OfferNodes.PACKID, pack.getId()));
+			results.forEach(new Block<Document>() {
+			    @Override
+			    public void apply(final Document result) {
+			    	Offer offer = new Offer();
+			    	
+			    	try {
+						offer.setReadDate(formatter.parse((String) result.get(DATE)));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+			    	
+			    	offer.setOffercode((String) result.getString(CODE));
+			    	
+			    	ObjectId packId = result.getObjectId(PACKID);
+			    	
+			    	offer.setPack(packReader.read(PackNodes.PACKID, packId.toHexString()));
+			    	
+			    	offers.add(offer);
+			    }
+			});
+		}
+		
+		return offers;
+	}
+    
+    @Override
 	public Offer read(String field, String value) {
 		FindIterable<Document> results = offersCollection.find(new Document(field, value));
 		final SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATEFORMAT);		

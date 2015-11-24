@@ -47,7 +47,10 @@ public class BookManningReader implements ManningReader<Book>, BookNodes {
 			Document dBook = booksFound.get(0); 
 			book.setId(dBook.getObjectId(BOOKID));
 			book.setTitle(dBook.getString(TITLE));
-			book.setTimes(dBook.getInteger(TIMES));
+			
+			Integer times = dBook.getInteger(TIMES);
+			
+			book.setTimes(times!=null?times:1);
 		} else {
 			if(isIdField) {
 				book.setId(oId);
@@ -58,6 +61,12 @@ public class BookManningReader implements ManningReader<Book>, BookNodes {
 		}
 			
 		return book;
+	}
+	
+	@Override
+	public List<Book> readSome(String field, String value) {
+		//TODO
+		return null;
 	}
 	
 	@Override

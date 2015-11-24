@@ -60,6 +60,37 @@ public class PackManningReader implements ManningReader<Pack>, PackNodes {
 	}
 
 	@Override
+	public List<Pack> readSome(String field, String value) {
+		List<Pack> packs = new ArrayList<Pack>();
+		Book bookFound = bookReader.read(field, value);
+		
+		if(bookFound != null) {
+			ObjectId bookId = bookFound.getId();
+			List<Document> packsFound = packsCollection.find(new Document(PackNodes.BOOKS, bookId)).into(new ArrayList<Document>());
+			
+			if(!packsFound.isEmpty()) {
+				for(Document dPack:packsFound) {
+					Pack pack = new Pack();
+					pack.setId(dPack.getObjectId(PACKID));
+					pack.setTimes(dPack.getInteger(TIMES));
+					List<ObjectId> bookIds = (List<ObjectId>) dPack.get(BOOKS);
+					List<Book> books = new ArrayList<Book>();
+						for(ObjectId bId:bookIds) {
+							if(bookFound.getId().toHexString().equals(bId.toHexString())) {
+								books.add(bookFound);
+							} else {
+								books.add(bookReader.read(BookNodes.BOOKID, bId.toHexString()));
+							}
+						}
+						pack.setBooks(books);
+						packs.add(pack);
+				}
+			}
+		}
+		return packs;
+	}
+	
+	@Override
 	public List<Pack> readAll() {
 		FindIterable<Document> packsFound = packsCollection.find();
 		final List<Pack> packs = new ArrayList<Pack>();
