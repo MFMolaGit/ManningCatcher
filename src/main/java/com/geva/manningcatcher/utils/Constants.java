@@ -23,4 +23,6 @@ public class Constants {
 	public static final String DATEFORMAT = "dd-MM-yyyy";
 	public static final String LARGE_DATEFORMAT = "dd/MM/yyyy - HH:mm:ss";
 
+	/** HOURS **/
+	public static final Integer HOUR_INCREMENT = 6;
 }

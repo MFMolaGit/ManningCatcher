@@ -42,7 +42,14 @@ public class ManningCatcherService {
 	@Produces("application/json")
 	@Path(value = "/list")
 	public List<Offer> getAllOffers() {
-		return catcher.listOffers();
+		return catcher.listAllOffers();
+	}
+	
+	@GET
+	@Produces("application/json")
+	@Path(value = "/list/{title}")
+	public List<Offer> getOffers(@PathParam(value = "title") String title) {
+		return catcher.listOffers(title);
 	}
 	
 }

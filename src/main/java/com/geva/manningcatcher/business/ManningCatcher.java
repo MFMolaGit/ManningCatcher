@@ -1,7 +1,6 @@
 package com.geva.manningcatcher.business;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +14,9 @@ import com.geva.manningcatcher.beans.New;
 import com.geva.manningcatcher.beans.Offer;
 import com.geva.manningcatcher.dao.read.ManningReader;
 import com.geva.manningcatcher.dao.write.ManningWriter;
+import com.geva.manningcatcher.utils.BookNodes;
 import com.geva.manningcatcher.utils.Constants;
+import com.geva.manningcatcher.utils.DateCalculator;
 import com.geva.manningcatcher.utils.OfferNodes;
 
 @Component(value="catcher")
@@ -39,7 +40,8 @@ public class ManningCatcher {
 		
 			log.info("ManningCatcher - catchLastOffer - " +
 					"Se captura una oferta (" + lastOffer.getOffercode() + ") desde ejecucion manual a las " + 
-					dateFormat.format(new Date()));
+					dateFormat.format(DateCalculator.getCurrentSpainDate()) + " (Spain) " +
+					dateFormat.format(DateCalculator.getCurrentServerDate()) + " (Server)");
 		
 		return lastOffer;
 	}
@@ -51,14 +53,38 @@ public class ManningCatcher {
 		
 			log.info("ManningCatcher - catchNewOffer - " +
 					"Se captura una oferta (" + lastOffer.getOffercode() + ") desde ejecucion automatica a las " + 
-					dateFormat.format(new Date()));
+					dateFormat.format(DateCalculator.getCurrentSpainDate()) + " (Spain) " +
+					dateFormat.format(DateCalculator.getCurrentServerDate()) + " (Server)");
+
 	}
 	
-	public List<Offer> listOffers() {
-		return offerReader.readAll();
+	public List<Offer> listOffers(final String title) {
+		
+		log.info("ManningCatcher - listOffers - " +
+				"Se listan todas las ofertas con libros con titulo " + title + " a las " + 
+				dateFormat.format(DateCalculator.getCurrentSpainDate()) + " (Spain) " +
+				dateFormat.format(DateCalculator.getCurrentServerDate()) + " (Server)");
+		
+		return offerReader.readSome(BookNodes.TITLE, title);
 	}
 
+	public List<Offer> listAllOffers() {
+		
+		log.info("ManningCatcher - listAllOffers - " +
+				"Se listan todas las ofertas a las " + 
+				dateFormat.format(DateCalculator.getCurrentSpainDate()) + " (Spain) " +
+				dateFormat.format(DateCalculator.getCurrentServerDate()) + " (Server)");
+		
+		return offerReader.readAll();
+	}
+	
 	public Offer getOffer(String date) {
+		
+		log.info("ManningCatcher - getOffer - " +
+				"Se devuelve la oferta correspondiente a la fecha " + date + " a las " + 
+				dateFormat.format(DateCalculator.getCurrentSpainDate()) + " (Spain) " +
+				dateFormat.format(DateCalculator.getCurrentServerDate()) + " (Server)");
+		
 		return offerReader.read(OfferNodes.DATE, date);
 	}
 
