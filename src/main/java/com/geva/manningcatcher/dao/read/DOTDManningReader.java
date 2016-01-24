@@ -38,6 +38,7 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 
 	private static Pattern mainBookAndCodePattern = Pattern.compile(">Get half off (.*?) - use code (dotd\\d+)<");
 	private static Pattern extraBooksPattern = Pattern.compile("Use this same code to save 50% on.*?<i>(.*?)<\\/i>.*?<i>(.*?)<\\/i>");
+	private static Pattern extraBooksPattern2 = Pattern.compile("Use this same code to get half off.*?>(.*?)<\\/a>.*?>(.*?)<\\/a>");
 	
     private URL url;
     private InputStream is = null;
@@ -94,11 +95,13 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 		        	
 		        	Matcher mExtraBooks = extraBooksPattern.matcher(line);
 			        	if(mExtraBooks.find()){
-			        		Book book2 = bookReader.read(BookNodes.TITLE, mExtraBooks.group(1));
-			        		Book book3 = bookReader.read(BookNodes.TITLE, mExtraBooks.group(2));
-			        		newOffer.getObject().addBook(book2);
-			        		newOffer.getObject().addBook(book3);
-			        	}	        	
+			        		extractExtraBooks(newOffer, mExtraBooks);
+			        	} else {
+				        	Matcher mExtraBooks2 = extraBooksPattern2.matcher(line);
+				        		if(mExtraBooks2.find()){
+				        			extractExtraBooks(newOffer, mExtraBooks2);
+				        		}
+			        	}
 		        }
 	        } catch (MalformedURLException mue) {
 		         mue.printStackTrace();
@@ -122,6 +125,13 @@ public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
         }
         
 	   return newOffer;
+	}
+
+	private void extractExtraBooks(New<Offer> newOffer, Matcher mExtraBooks) {
+		Book book2 = bookReader.read(BookNodes.TITLE, mExtraBooks.group(1));
+		Book book3 = bookReader.read(BookNodes.TITLE, mExtraBooks.group(2));
+		newOffer.getObject().addBook(book2);
+		newOffer.getObject().addBook(book3);
 	}
 	
     @Override
