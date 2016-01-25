@@ -37,8 +37,8 @@ import com.mongodb.client.MongoCollection;
 public class DOTDManningReader implements ManningReader<Offer>, OfferNodes {
 
 	private static Pattern mainBookAndCodePattern = Pattern.compile(">Get half off (.*?) - use code (dotd\\d+)<");
-	private static Pattern extraBooksPattern = Pattern.compile("Use this same code to save 50% on.*?<i>(.*?)<\\/i>.*?<i>(.*?)<\\/i>");
-	private static Pattern extraBooksPattern2 = Pattern.compile("Use this same code to get half off.*?>(.*?)<\\/a>.*?>(.*?)<\\/a>");
+	private static Pattern extraBooksPattern = Pattern.compile("Use this same code to save 50% on.*?<i>(.*?)<\\/i>.*?<i>(.*?)<\\/i>"); //Patron opcion 1
+	private static Pattern extraBooksPattern2 = Pattern.compile("Use this same code to get half off.*?>(.*?)<\\/a>.*?>(.*?)<\\/a>"); //Patron opcion 2
 	
     private URL url;
     private InputStream is = null;
