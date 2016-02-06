@@ -34,13 +34,17 @@ public class BookManningReader implements ManningReader<Book>, BookNodes {
 		
 		ObjectId oId = null;
 		boolean isIdField = false;
+		StringBuilder regexValue = new StringBuilder("{ $regex: ");
 		
 		if(BookNodes.BOOKID.equals(field)) {
 			isIdField = true;
 			oId = new ObjectId(value);
+		} else {
+			regexValue.append(value)
+				.append(", $options: 'i' } }");
 		}
 		
-		List<Document> booksFound = booksCollection.find(new Document(field, isIdField?oId:value)).into(new ArrayList<Document>());
+		List<Document> booksFound = booksCollection.find(new Document(field, isIdField?oId:regexValue.toString())).into(new ArrayList<Document>());
 		Book book = new Book();
 		
 		if(!booksFound.isEmpty()) {

@@ -18,7 +18,7 @@ import com.geva.manningcatcher.business.ManningCatcher;
 @Component
 @Path("/manningCatcher")
 @EnableScheduling
-public class ManningCatcherService {
+public class ManningCatcherService implements IManningCatcherService {
 	
 	@Autowired
 	@Qualifier(value="catcher")
@@ -27,6 +27,7 @@ public class ManningCatcherService {
 	@GET
 	@Produces("application/json")
 	@Path(value = "/catchOffer")
+	@Override
 	public Offer getOffer() {
 		return catcher.catchLastOffer();
 	}
@@ -34,6 +35,7 @@ public class ManningCatcherService {
 	@GET
 	@Produces("application/json")
 	@Path(value = "/offer/{date}")
+	@Override
 	public Offer getOffer(@PathParam(value = "date") String date) {
 		return catcher.getOffer(date);
 	}
@@ -41,6 +43,7 @@ public class ManningCatcherService {
 	@GET
 	@Produces("application/json")
 	@Path(value = "/list")
+	@Override
 	public List<Offer> getAllOffers() {
 		return catcher.listAllOffers();
 	}
@@ -48,6 +51,7 @@ public class ManningCatcherService {
 	@GET
 	@Produces("application/json")
 	@Path(value = "/list/{title}")
+	@Override
 	public List<Offer> getOffers(@PathParam(value = "title") String title) {
 		return catcher.listOffers(title);
 	}
